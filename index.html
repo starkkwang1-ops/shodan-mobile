@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Shodan" />
+<meta name="theme-color" content="#0b1220" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-180.png" />
+<title>Shodan 移动端</title>
+<style>
+:root {
+  --bg: #0b1220;
+  --bg2: #111827;
+  --bg3: #1f2937;
+  --card: #151c2c;
+  --border: #2a3548;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --accent: #22d3ee;
+  --accent2: #a78bfa;
+  --danger: #f87171;
+  --ok: #34d399;
+  --warn: #fbbf24;
+  --radius: 14px;
+  --tap: 48px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  min-height: 100%;
+  min-height: 100dvh;
+}
+body {
+  padding-top: var(--safe-top);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  padding-bottom: calc(72px + var(--safe-bottom));
+}
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+a { color: var(--accent); }
+
+.app-header {
+  position: sticky; top: 0; z-index: 40;
+  background: rgba(11,18,32,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px 10px;
+}
+.app-header h1 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: flex; align-items: center; gap: 8px;
+}
+.app-header h1 .dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+.app-header .sub {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.header-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.key-chip {
+  font-size: 0.72rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  max-width: 46vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.key-chip.ok { color: var(--ok); border-color: #065f46; }
+
+main { padding: 12px 14px 24px; max-width: 720px; margin: 0 auto; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.card h2 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.credit-note {
+  background: #1a2336;
+  border: 1px solid #334155;
+  border-left: 3px solid var(--warn);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  margin-bottom: 12px;
+}
+
+.field { margin-bottom: 12px; }
+.field label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.field input, .field textarea, .field select {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  outline: none;
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(34,211,238,0.15);
+}
+.field textarea { min-height: 88px; resize: vertical; }
+
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.row > * { flex: 1 1 auto; min-width: 0; }
+
+.btn {
+  min-height: var(--tap);
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: #06202a;
+  font-weight: 650;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  user-select: none;
+}
+.btn:active { transform: scale(0.98); opacity: 0.92; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn.secondary {
+  background: var(--bg3);
+  color: var(--text);
+  border-color: var(--border);
+}
+.btn.ghost {
+  background: transparent;
+  color: var(--muted);
+  border-color: var(--border);
+}
+.btn.danger {
+  background: #3f1d1d;
+  color: var(--danger);
+  border-color: #7f1d1d;
+}
+.btn.small {
+  min-height: 36px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  border-radius: 10px;
+}
+
+.tabs {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  background: rgba(17,24,39,0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  padding: 6px 4px calc(6px + var(--safe-bottom));
+}
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 0.68rem;
+  padding: 6px 2px;
+  min-height: 52px;
+  border-radius: 10px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  cursor: pointer;
+}
+.tab-btn .ico { font-size: 1.15rem; line-height: 1; }
+.tab-btn.active {
+  color: var(--accent);
+  background: rgba(34,211,238,0.08);
+}
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.kv {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 6px 10px;
+  font-size: 0.9rem;
+}
+.kv .k { color: var(--muted); }
+.kv .v { word-break: break-word; }
+
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  margin: 2px 4px 2px 0;
+}
+.badge.port { color: var(--accent); border-color: #155e75; }
+.badge.vuln { color: var(--danger); border-color: #7f1d1d; background: #2a1212; }
+.badge.ok { color: var(--ok); border-color: #065f46; }
+.badge.warn { color: var(--warn); border-color: #854d0e; }
+
+.result-list { display: flex; flex-direction: column; gap: 10px; }
+.host-card, .result-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+.result-item .ip {
+  font-weight: 700;
+  font-size: 1.02rem;
+  color: var(--accent);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.meta { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+.banner {
+  margin-top: 8px;
+  background: #0a0f1a;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 220px;
+  overflow: auto;
+}
+details.service {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #0e1524;
+  margin-top: 8px;
+  overflow: hidden;
+}
+details.service summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px;
+  min-height: var(--tap);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  user-select: none;
+}
+details.service summary::-webkit-details-marker { display: none; }
+details.service[open] summary { border-bottom: 1px solid var(--border); }
+details.service .body { padding: 10px 12px 12px; }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(84px + var(--safe-bottom));
+  transform: translateX(-50%) translateY(20px);
+  background: #1e293b;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  z-index: 100;
+  max-width: 90vw;
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.alert {
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  border: 1px solid;
+}
+.alert.error { background: #2a1212; border-color: #7f1d1d; color: #fecaca; }
+.alert.info { background: #0c1e2a; border-color: #155e75; color: #a5f3fc; }
+.alert.warn { background: #2a2110; border-color: #854d0e; color: #fde68a; }
+
+.loading {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--muted); font-size: 0.9rem;
+}
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.pager {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: 12px;
+}
+.pager .info { font-size: 0.8rem; color: var(--muted); }
+
+.facet-block { margin-top: 10px; }
+.facet-block h3 {
+  margin: 0 0 6px;
+  font-size: 0.85rem;
+  color: var(--accent2);
+}
+.bar-row {
+  display: grid;
+  grid-template-columns: 1fr 56px;
+  gap: 8px;
+  align-items: center;
+  margin: 4px 0;
+  font-size: 0.8rem;
+}
+.bar-track {
+  background: var(--bg3);
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 999px;
+}
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 28px 12px;
+  font-size: 0.9rem;
+}
+.score-big {
+  font-size: 2.4rem;
+  font-weight: 800;
+  text-align: center;
+  margin: 8px 0;
+  color: var(--accent);
+}
+.hidden { display: none !important; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="header-row">
+    <div>
+      <h1><span class="dot"></span>Shodan 移动端</h1>
+      <div class="sub">Safari / 主屏幕可用 · 直连 api.shodan.io</div>
+    </div>
+    <div id="keyChip" class="key-chip">未设置 API Key</div>
+  </div>
+</header>
+
+<main>
+  <!-- AUTH -->
+  <section id="panel-auth" class="panel active">
+    <div class="card">
+      <h2>API Key</h2>
+      <p class="hint">密钥仅保存在本机 localStorage，不会上传到第三方。可在 <span class="mono">account.shodan.io</span> 查看。</p>
+      <div class="field">
+        <label for="apiKeyInput">Shodan API Key</label>
+        <input id="apiKeyInput" type="password" autocomplete="off" placeholder="粘贴你的 API Key" />
+      </div>
+      <div class="row">
+        <button class="btn" id="btnSaveKey" type="button">保存并验证</button>
+        <button class="btn danger" id="btnClearKey" type="button">清除</button>
+      </div>
+    </div>
+    <div id="authResult"></div>
+    <div class="card">
+      <h2>安装到主屏幕</h2>
+      <p class="hint">在 iPhone Safari：分享 →「添加到主屏幕」。深色主题、大按钮，适合单手操作。</p>
+    </div>
+  </section>
+
+  <!-- INFO -->
+  <section id="panel-info" class="panel">
+    <div class="card">
+      <h2>账户信息 <button class="btn small secondary" id="btnRefreshInfo" type="button">刷新</button></h2>
+      <p class="hint">对应 CLI：<span class="mono">shodan info</span></p>
+      <div id="infoBox"><div class="empty">保存 API Key 后自动加载</div></div>
+    </div>
+    <div class="card">
+      <h2>我的公网 IP</h2>
+      <p class="hint">对应 CLI：<span class="mono">shodan myip</span></p>
+      <button class="btn secondary" id="btnMyIp" type="button">查询 myip</button>
+      <div id="myipBox" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <!-- HOST -->
+  <section id="panel-host" class="panel">
+    <div class="card">
+      <h2>主机查询</h2>
+      <p class="hint">对应 CLI：<span class="mono">shodan host &lt;ip&gt;</span></p>
+      <div class="field">
+        <label for="hostIp">IP 地址</label>
+        <input id="hostIp" type="text" inputmode="decimal" placeholder="例如 8.8.8.8" />
+      </div>
+      <div class="field">
+        <label><input type="checkbox" id="hostHistory" /> 包含历史数据（history）</label>
+      </div>
+      <button class="btn" id="btnHost" type="button">查询主机</button>
+    </div>
+    <div id="hostResult"></div>
+  </section>
+
+  <!-- SEARCH -->
+  <section id="panel-search" class="panel">
+    <div class="credit-note">提示：搜索与部分过滤器会消耗 <strong>query credits</strong>。分页也会再次计费。</div>
+    <div class="card">
+      <h2>搜索</h2>
+      <p class="hint">对应 CLI：<span class="mono">shodan search</span> / <span class="mono">count</span> / facets</p>
+      <div class="field">
+        <label for="searchQuery">查询语句</label>
+        <textarea id="searchQuery" placeholder="例如 apache country:CN&#10;或 product:nginx port:443"></textarea>
+      </div>
+      <div class="field">
+        <label for="searchFacets">Facets（逗号分隔，可选）</label>
+        <input id="searchFacets" type="text" placeholder="country,org,port,product" value="country,org,port" />
+      </div>
+      <div class="row">
+        <button class="btn" id="btnSearch" type="button">搜索</button>
+        <button class="btn secondary" id="btnCount" type="button">仅计数</button>
+      </div>
+    </div>
+    <div id="searchResult"></div>
+  </section>
+
+  <!-- DNS / LABS / MORE -->
+  <section id="panel-tools" class="panel">
+    <div class="card">
+      <h2>域名 DNS</h2>
+      <p class="hint">对应 CLI：<span class="mono">shodan domain</span></p>
+      <div class="field">
+        <label for="domainInput">域名</label>
+        <input id="domainInput" type="text" placeholder="example.com" autocomplete="off" />
+      </div>
+      <button class="btn" id="btnDomain" type="button">查询域名</button>
+      <div id="domainResult" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card">
+      <h2>DNS Resolve / Reverse</h2>
+      <div class="field">
+        <label for="dnsHostnames">主机名（逗号分隔）→ Resolve</label>
+        <input id="dnsHostnames" type="text" placeholder="google.com,bing.com" />
+      </div>
+      <button class="btn secondary" id="btnDnsResolve" type="button">Resolve</button>
+      <div class="field" style="margin-top:12px">
+        <label for="dnsIps">IP（逗号分隔）→ Reverse</label>
+        <input id="dnsIps" type="text" inputmode="decimal" placeholder="8.8.8.8,1.1.1.1" />
+      </div>
+      <button class="btn secondary" id="btnDnsReverse" type="button">Reverse</button>
+      <div id="dnsResult" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card">
+      <h2>Honeyscore</h2>
+      <p class="hint">对应 CLI：<span class="mono">shodan honeyscore</span>（labs）</p>
+      <div class="field">
+        <label for="honeyIp">IP</label>
+        <input id="honeyIp" type="text" inputmode="decimal" placeholder="IP 地址" />
+      </div>
+      <button class="btn" id="btnHoney" type="button">计算蜜罐分数</button>
+      <div id="honeyResult" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card">
+      <h2>Exploits 搜索</h2>
+      <p class="hint">使用 exploits.shodan.io（若账户可用）</p>
+      <div class="field">
+        <label for="exploitQuery">查询</label>
+        <input id="exploitQuery" type="text" placeholder="例如 apache 或 CVE-2021-44228" />
+      </div>
+      <button class="btn secondary" id="btnExploits" type="button">搜索 Exploits</button>
+      <div id="exploitResult" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card">
+      <h2>网络警报（只读）</h2>
+      <p class="hint">对应 CLI：<span class="mono">shodan alert list</span></p>
+      <button class="btn secondary" id="btnAlerts" type="button">列出 Alerts</button>
+      <div id="alertResult" style="margin-top:10px"></div>
+    </div>
+  </section>
+</main>
+
+<nav class="tabs" aria-label="主导航">
+  <button class="tab-btn active" data-tab="auth" type="button"><span class="ico">🔑</span>密钥</button>
+  <button class="tab-btn" data-tab="info" type="button"><span class="ico">ℹ️</span>账户</button>
+  <button class="tab-btn" data-tab="host" type="button"><span class="ico">🖥</span>主机</button>
+  <button class="tab-btn" data-tab="search" type="button"><span class="ico">🔎</span>搜索</button>
+  <button class="tab-btn" data-tab="tools" type="button"><span class="ico">🛠</span>工具</button>
+</nav>
+
+<div id="toast" class="toast" role="status"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'shodan_api_key';
+  var API = 'https://api.shodan.io';
+  var EXPLOITS_API = 'https://exploits.shodan.io/api';
+
+  var state = {
+    key: localStorage.getItem(STORAGE_KEY) || '',
+    searchPage: 1,
+    lastQuery: '',
+    lastFacets: '',
+    lastSearchData: null
+  };
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function toast(msg) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(function () { t.classList.remove('show'); }, 2200);
+  }
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function maskKey(k) {
+    if (!k) return '未设置 API Key';
+    if (k.length <= 8) return '已设置 · ****';
+    return '已设置 · ' + k.slice(0, 4) + '…' + k.slice(-4);
+  }
+  function updateKeyChip() {
+    var chip = $('keyChip');
+    chip.textContent = maskKey(state.key);
+    chip.classList.toggle('ok', !!state.key);
+    $('apiKeyInput').value = state.key || '';
+  }
+  function setLoading(container, msg) {
+    container.innerHTML = '<div class="loading"><span class="spinner"></span>' + escapeHtml(msg || '加载中…') + '</div>';
+  }
+  function friendlyError(status, body) {
+    var msg = '';
+    try {
+      var j = typeof body === 'string' ? JSON.parse(body) : body;
+      msg = (j && (j.error || j.message)) || '';
+    } catch (e) { msg = (typeof body === 'string' ? body : '') || ''; }
+    if (status === 401) return '无效的 API Key（401）。请检查密钥后重试。' + (msg ? ' ' + msg : '');
+    if (status === 403) return '权限不足或套餐限制（403）。' + (msg ? ' ' + msg : '');
+    if (status === 404) return '未找到资源（404）。' + (msg ? ' ' + msg : '');
+    if (status === 429) return '请求过于频繁（429）。请稍后再试。' + (msg ? ' ' + msg : '');
+    return '请求失败' + (status ? '（' + status + '）' : '') + (msg ? '：' + msg : '');
+  }
+  function showError(container, text) {
+    container.innerHTML = '<div class="alert error">' + escapeHtml(text) + '</div>';
+  }
+  function copyText(text) {
+    if (!text) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { toast('已复制'); }).catch(function () {
+        fallbackCopy(text);
+      });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); toast('已复制'); } catch (e) { toast('复制失败'); }
+    document.body.removeChild(ta);
+  }
+  function downloadJson(filename, data) {
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    toast('已导出 JSON');
+  }
+  function requireKey() {
+    if (!state.key) {
+      toast('请先设置 API Key');
+      switchTab('auth');
+      return false;
+    }
+    return true;
+  }
+
+  async function shodanFetch(path, params, opts) {
+    opts = opts || {};
+    var base = opts.base || API;
+    var url = new URL(base + path);
+    var q = params || {};
+    q.key = state.key;
+    Object.keys(q).forEach(function (k) {
+      if (q[k] != null && q[k] !== '') url.searchParams.set(k, q[k]);
+    });
+    var res = await fetch(url.toString(), { method: 'GET' });
+    var text = await res.text();
+    var data = null;
+    try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
+    if (!res.ok) {
+      var err = new Error(friendlyError(res.status, data || text));
+      err.status = res.status;
+      err.data = data;
+      throw err;
+    }
+    return data;
+  }
+
+  /* Tabs */
+  function switchTab(name) {
+    document.querySelectorAll('.panel').forEach(function (p) {
+      p.classList.toggle('active', p.id === 'panel-' + name);
+    });
+    document.querySelectorAll('.tab-btn').forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-tab') === name);
+    });
+  }
+  document.querySelectorAll('.tab-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      switchTab(btn.getAttribute('data-tab'));
+    });
+  });
+
+  /* Auth */
+  $('btnSaveKey').addEventListener('click', async function () {
+    var k = ($('apiKeyInput').value || '').trim();
+    if (!k) { toast('请输入 API Key'); return; }
+    state.key = k;
+    localStorage.setItem(STORAGE_KEY, k);
+    updateKeyChip();
+    var box = $('authResult');
+    setLoading(box, '验证中…');
+    try {
+      var info = await shodanFetch('/api-info');
+      box.innerHTML = '<div class="alert info">密钥有效。套餐：' + escapeHtml(info.plan || '-') +
+        ' · 剩余 query credits：' + escapeHtml(String(info.query_credits != null ? info.query_credits : '-')) + '</div>';
+      toast('已保存');
+      renderInfo(info);
+    } catch (e) {
+      showError(box, e.message || String(e));
+    }
+  });
+  $('btnClearKey').addEventListener('click', function () {
+    state.key = '';
+    localStorage.removeItem(STORAGE_KEY);
+    updateKeyChip();
+    $('authResult').innerHTML = '<div class="alert warn">已清除本地 API Key</div>';
+    $('infoBox').innerHTML = '<div class="empty">保存 API Key 后自动加载</div>';
+    toast('已清除');
+  });
+
+  function renderInfo(info) {
+    var box = $('infoBox');
+    if (!info) { box.innerHTML = '<div class="empty">无数据</div>'; return; }
+    var html = '<div class="kv">' +
+      '<div class="k">套餐</div><div class="v"><span class="badge ok">' + escapeHtml(info.plan || '-') + '</span></div>' +
+      '<div class="k">Query 积分</div><div class="v">' + escapeHtml(String(info.query_credits != null ? info.query_credits : '-')) + '</div>' +
+      '<div class="k">Scan 积分</div><div class="v">' + escapeHtml(String(info.scan_credits != null ? info.scan_credits : '-')) + '</div>' +
+      '<div class="k">已用查询</div><div class="v">' + escapeHtml(String(info.usage_limits && info.usage_limits.query_credits != null ? info.usage_limits.query_credits : '-')) + '</div>' +
+      '<div class="k">已用扫描</div><div class="v">' + escapeHtml(String(info.usage_limits && info.usage_limits.scan_credits != null ? info.usage_limits.scan_credits : '-')) + '</div>' +
+      '<div class="k">监控</div><div class="v">' + escapeHtml(String(info.usage_limits && info.usage_limits.monitored_ips != null ? info.usage_limits.monitored_ips : (info.monitored_ips != null ? info.monitored_ips : '-'))) + '</div>' +
+      '<div class="k">未锁定</div><div class="v">' + escapeHtml(String(info.unlocked != null ? info.unlocked : '-')) + '</div>' +
+      '<div class="k">HTTPS</div><div class="v">' + escapeHtml(String(info.https != null ? info.https : '-')) + '</div>' +
+      '</div>';
+    html += '<div class="toolbar" style="margin-top:12px"><button class="btn small secondary" type="button" id="btnExportInfo">导出 JSON</button></div>';
+    box.innerHTML = html;
+    $('btnExportInfo').onclick = function () { downloadJson('shodan-api-info.json', info); };
+  }
+
+  async function loadInfo() {
+    if (!state.key) return;
+    setLoading($('infoBox'));
+    try {
+      var info = await shodanFetch('/api-info');
+      renderInfo(info);
+    } catch (e) {
+      showError($('infoBox'), e.message || String(e));
+    }
+  }
+  $('btnRefreshInfo').addEventListener('click', loadInfo);
+
+  $('btnMyIp').addEventListener('click', async function () {
+    if (!requireKey()) return;
+    var box = $('myipBox');
+    setLoading(box);
+    try {
+      var ip = await shodanFetch('/tools/myip');
+      // API may return plain string JSON-encoded
+      if (typeof ip === 'string') {
+        /* already string */
+      } else if (ip && typeof ip === 'object') {
+        ip = JSON.stringify(ip);
+      }
+      var ipStr = String(ip).replace(/^"|"$/g, '');
+      box.innerHTML = '<div class="result-item"><div class="ip">' + escapeHtml(ipStr) +
+        ' <button class="btn small ghost" type="button" data-copy="' + escapeHtml(ipStr) + '">复制</button></div></div>';
+      box.querySelector('[data-copy]').onclick = function () { copyText(ipStr); };
+    } catch (e) {
+      showError(box, e.message || String(e));
+    }
+  });
+
+  /* Host */
+  function renderHost(data) {
+    var box = $('hostResult');
+    var ports = data.ports || [];
+    var vulns = data.vulns || [];
+    if (!Array.isArray(vulns) && vulns && typeof vulns === 'object') vulns = Object.keys(vulns);
+
+    var html = '<div class="card host-card">';
+    html += '<div class="toolbar"><button class="btn small secondary" type="button" id="btnExportHost">导出 JSON</button>' +
+      '<button class="btn small ghost" type="button" id="btnCopyHostIp">复制 IP</button></div>';
+    html += '<div class="kv">' +
+      '<div class="k">IP</div><div class="v mono">' + escapeHtml(data.ip_str || data.ip || '') + '</div>' +
+      '<div class="k">主机名</div><div class="v">' + escapeHtml((data.hostnames || []).join(', ') || '-') + '</div>' +
+      '<div class="k">组织</div><div class="v">' + escapeHtml(data.org || '-') + '</div>' +
+      '<div class="k">ISP</div><div class="v">' + escapeHtml(data.isp || '-') + '</div>' +
+      '<div class="k">ASN</div><div class="v">' + escapeHtml(data.asn || '-') + '</div>' +
+      '<div class="k">地理位置</div><div class="v">' + escapeHtml([data.city, data.region_code, data.country_name || data.country_code].filter(Boolean).join(', ') || '-') +
+      (data.latitude != null ? ' (' + data.latitude + ', ' + data.longitude + ')' : '') + '</div>' +
+      '<div class="k">操作系统</div><div class="v">' + escapeHtml(data.os || '-') + '</div>' +
+      '<div class="k">最近更新</div><div class="v">' + escapeHtml(data.last_update || '-') + '</div>' +
+      '</div>';
+
+    html += '<div style="margin-top:10px"><strong>端口</strong><div class="chip-row">';
+    ports.forEach(function (p) { html += '<span class="badge port">' + escapeHtml(String(p)) + '</span>'; });
+    if (!ports.length) html += '<span class="meta">无</span>';
+    html += '</div></div>';
+
+    if (vulns && vulns.length) {
+      html += '<div style="margin-top:10px"><strong>漏洞</strong><div class="chip-row">';
+      vulns.forEach(function (v) { html += '<span class="badge vuln">' + escapeHtml(String(v)) + '</span>'; });
+      html += '</div></div>';
+    }
+
+    var services = data.data || [];
+    html += '<div style="margin-top:12px"><strong>服务 / Banner</strong>（' + services.length + '）</div>';
+    services.forEach(function (svc, idx) {
+      var title = (svc.port || '?') + '/' + (svc.transport || 'tcp') + ' · ' + (svc.product || svc._shodan && svc._shodan.module || 'service');
+      html += '<details class="service"' + (idx === 0 ? ' open' : '') + '><summary>' +
+        '<span class="badge port">' + escapeHtml(String(svc.port || '?')) + '</span>' +
+        '<span>' + escapeHtml(svc.product || '') + '</span>' +
+        '<span class="meta">' + escapeHtml(svc.transport || '') + (svc.version ? ' v' + escapeHtml(svc.version) : '') + '</span>' +
+        '</summary><div class="body">';
+      html += '<div class="kv">' +
+        '<div class="k">模块</div><div class="v">' + escapeHtml((svc._shodan && svc._shodan.module) || '-') + '</div>' +
+        '<div class="k">时间</div><div class="v">' + escapeHtml(svc.timestamp || '-') + '</div>' +
+        '</div>';
+      if (svc.opts && Object.keys(svc.opts).length) {
+        html += '<div class="meta" style="margin-top:6px">opts: ' + escapeHtml(JSON.stringify(svc.opts)) + '</div>';
+      }
+      if (svc.data) {
+        html += '<div class="banner">' + escapeHtml(svc.data) + '</div>';
+      }
+      html += '</div></details>';
+    });
+
+    html += '</div>';
+    box.innerHTML = html;
+    $('btnExportHost').onclick = function () { downloadJson('shodan-host-' + (data.ip_str || 'ip') + '.json', data); };
+    $('btnCopyHostIp').onclick = function () { copyText(data.ip_str || String(data.ip || '')); };
+  }
+
+  $('btnHost').addEventListener('click', async function () {
+    if (!requireKey()) return;
+    var ip = ($('hostIp').value || '').trim();
+    if (!ip) { toast('请输入 IP'); return; }
+    var box = $('hostResult');
+    setLoading(box, '查询主机…');
+    try {
+      var params = {};
+      if ($('hostHistory').checked) params.history = 'true';
+      var data = await shodanFetch('/shodan/host/' + encodeURIComponent(ip), params);
+      renderHost(data);
+    } catch (e) {
+      showError(box, e.message || String(e));
+    }
+  });
+
+  /* Search / Count / Facets */
+  function renderFacets(facets) {
+    if (!facets || typeof facets !== 'object') return '';
+    var keys = Object.keys(facets);
+    if (!keys.length) return '';
+    var html = '<div class="card"><h2>Facets / 统计</h2>';
+    keys.forEach(function (fk) {
+      var arr = facets[fk] || [];
+      var max = 1;
+      arr.forEach(function (it) { if (it.count > max) max = it.count; });
+      html += '<div class="facet-block"><h3>' + escapeHtml(fk) + '</h3>';
+      arr.slice(0, 15).forEach(function (it) {
+        var pct = Math.max(4, Math.round((it.count / max) * 100));
+        html += '<div class="bar-row"><div><div style="margin-bottom:3px">' + escapeHtml(String(it.value)) +
+          '</div><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div></div>' +
+          '<div style="text-align:right">' + escapeHtml(String(it.count)) + '</div></div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function renderSearch(data, page) {
+    var box = $('searchResult');
+    state.lastSearchData = data;
+    var matches = data.matches || [];
+    var total = data.total != null ? data.total : matches.length;
+    var html = '';
+    html += renderFacets(data.facets);
+    html += '<div class="card">';
+    html += '<div class="toolbar">' +
+      '<button class="btn small secondary" type="button" id="btnExportSearch">导出本页 JSON</button>' +
+      '</div>';
+    html += '<div class="meta">共约 ' + escapeHtml(String(total)) + ' 条 · 第 ' + page + ' 页 · 本页 ' + matches.length + ' 条</div>';
+    html += '<div class="result-list" style="margin-top:10px">';
+    if (!matches.length) {
+      html += '<div class="empty">无匹配结果</div>';
+    }
+    matches.forEach(function (m) {
+      var ip = m.ip_str || m.ip || '';
+      html += '<div class="result-item">';
+      html += '<div class="ip"><span class="mono">' + escapeHtml(String(ip)) + '</span>' +
+        ' <button class="btn small ghost copy-ip" type="button" data-ip="' + escapeHtml(String(ip)) + '">复制</button></div>';
+      html += '<div class="meta">' +
+        escapeHtml([m.org, m.isp, m.location && (m.location.city || m.location.country_name)].filter(Boolean).join(' · ')) +
+        (m.port != null ? ' · 端口 ' + escapeHtml(String(m.port)) : '') +
+        (m.product ? ' · ' + escapeHtml(m.product) : '') +
+        '</div>';
+      if (m.hostnames && m.hostnames.length) {
+        html += '<div class="meta">主机名：' + escapeHtml(m.hostnames.join(', ')) + '</div>';
+      }
+      if (m.data) {
+        html += '<details class="service"><summary>查看 Banner</summary><div class="body"><div class="banner">' +
+          escapeHtml(m.data) + '</div></div></details>';
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<div class="pager">' +
+      '<button class="btn small secondary" type="button" id="btnPrevPage"' + (page <= 1 ? ' disabled' : '') + '>上一页</button>' +
+      '<div class="info">页码 ' + page + '</div>' +
+      '<button class="btn small secondary" type="button" id="btnNextPage"' + (matches.length === 0 ? ' disabled' : '') + '>下一页</button>' +
+      '</div></div>';
+    box.innerHTML = html;
+    box.querySelectorAll('.copy-ip').forEach(function (b) {
+      b.addEventListener('click', function () { copyText(b.getAttribute('data-ip')); });
+    });
+    var exp = $('btnExportSearch');
+    if (exp) exp.onclick = function () { downloadJson('shodan-search-p' + page + '.json', data); };
+    var prev = $('btnPrevPage');
+    var next = $('btnNextPage');
+    if (prev) prev.onclick = function () { if (state.searchPage > 1) doSearch(state.searchPage - 1); };
+    if (next) next.onclick = function () { doSearch(state.searchPage + 1); };
+  }
+
+  async function doSearch(page) {
+    if (!requireKey()) return;
+    var q = ($('searchQuery').value || '').trim();
+    if (!q) { toast('请输入查询语句'); return; }
+    state.searchPage = page || 1;
+    state.lastQuery = q;
+    state.lastFacets = ($('searchFacets').value || '').trim();
+    var box = $('searchResult');
+    setLoading(box, '搜索中（消耗 query credits）…');
+    try {
+      var params = { query: q, page: String(state.searchPage) };
+      if (state.lastFacets) params.facets = state.lastFacets;
+      var data = await shodanFetch('/shodan/host/search', params);
+      renderSearch(data, state.searchPage);
+    } catch (e) {
+      showError(box, e.message || String(e));
+    }
+  }
+
+  $('btnSearch').addEventListener('click', function () { doSearch(1); });
+
+  $('btnCount').addEventListener('click', async function () {
+    if (!requireKey()) return;
+    var q = ($('searchQuery').value || '').trim();
+    if (!q) { toast('请输入查询语句'); return; }
+    var facets = ($('searchFacets').value || '').trim();
+    var box = $('searchResult');
+    setLoading(box, '计数中…');
+    try {
+      var params = { query: q };
+      if (facets) params.facets = facets;
+      var data = await shodanFetch('/shodan/host/count', params);
+      var html = '<div class="card"><h2>计数结果</h2>' +
+        '<div class="score-big">' + escapeHtml(String(data.total != null ? data.total : 0)) + '</div>' +
+        '<div class="meta" style="text-align:center">匹配主机数</div>' +
+        '<div class="toolbar" style="margin-top:12px;justify-content:center">' +
+        '<button class="btn small secondary" type="button" id="btnExportCount">导出 JSON</button></div></div>';
+      html += renderFacets(data.facets);
+      box.innerHTML = html;
+      $('btnExportCount').onclick = function () { downloadJson('shodan-count.json', data); };
+    } catch (e) {
+      showError(box, e.message || String(e));
+    }
+  });
+
+  /* Domain */
+  $('btnDomain').addEventListener('click', async function () {
+    if (!requireKey()) return;
+    var domain = ($('domainInput').value || '').trim().replace(/^https?:\/\//, '').split('/')[0];
+    if (!domain) { toast('请输入域名'); return; }
+    var box = $('domainResult');
+    setLoading(box);
+    try {
+      var data = await shodanFetch('/dns/domain/' + encodeURIComponent(domain));
+      var html = '<div class="result-item">';
+      html += '<div class="toolbar"><button class="btn small secondary" type="button" id="btnExportDomain">导出 JSON</button></div>';
+      html += '<div class="kv">' +
+        '<div class="k">域名</div><div class="v">' + escapeHtml(data.domain || domain) + '</div>' +
+        '<div class="k">标签</div><div class="v">' + escapeHtml((data.tags || []).join(', ') || '-') + '</div>' +
+        '<div class="k">子域</div><div class="v">' + escapeHtml((data.subdomains || []).slice(0, 50).join(', ') || '-') +
+        ((data.subdomains || []).length > 50 ? ' …' : '') + '</div>' +
+        '</div>';
+      var records = data.data || [];
+      html += '<div style="margin-top:10px"><strong>DNS 记录</strong>（' + records.length + '）</div>';
+      records.slice(0, 100).forEach(function (r) {
+        html += '<div class="meta mono" style="margin-top:4px">' +
+          escapeHtml((r.type || '') + '  ' + (r.subdomain || '@') + ' → ' + (r.value || '')) +
+          (r.ports && r.ports.length ? '  ports:' + escapeHtml(r.ports.join(',')) : '') +
+          '</div>';
+      });
+      html += '</div>';
+      box.innerHTML = html;
+      $('btnExportDomain').onclick = function () { downloadJson('shodan-domain-' + domain + '.json', data); };
+    } catch (e) {
+      showError(box, e.message || String(e));
+    }
+  });
+
+  function renderDnsMap(data, title) {
+    var html = '<div class="result-item"><strong>' + escapeHtml(title) + '</strong>';
+    html += '<div class="toolbar" style="margin-top:8px"><button class="btn small secondary" type="button" class="exp">导出</button></div>';
+    html += '<div class="kv" style="margin-top:8px">';
+    if (data && typeof data === 'object') {
+      Object.keys(data).forEach(function (k) {
+        var v = data[k];
+        var vs = Array.isArray(v) ? v.join(', ') : (v == null ? '-' : String(v));
+        html += '<div class="k mono">' + escapeHtml(k) + '</div><div class="v mono">' + escapeHtml(vs || '-') +
+          (vs && vs !== '-' ? ' <button class="btn small ghost copy-dns" type="button" data-v="' + escapeHtml(vs) + '">复制</button>' : '') +
+          '</div>';
+      });
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  $('btnDnsResolve').addEventListener('click', async function () {
+    if (!requireKey()) return;
+    var h = ($('dnsHostnames').value || '').trim();
+    if (!h) { toast('请输入主机名'); return; }
+    var box = $('dnsResult');
+    setLoading(box);
+    try {
+      var data = await shodanFetch('/dns/resolve', { hostnames: h });
+      box.innerHTML = renderDnsMap(data, 'Resolve 结果');
+      box.querySelectorAll('.copy-dns').forEach(function (b) {
+        b.addEventListener('click', function () { copyText(b.getAttribute('data-v')); });
+      });
+      var exp = box.querySelector('.toolbar .btn');
+      if (exp) exp.onclick = function () { downloadJson('shodan-dns-resolve.json', data); };
+    } catch (e) {
+      showError(box, e.message || String(e));
+    }
+  });
+
+  $('btnDnsReverse').addEventListener('click', async function () {
+    if (!requireKey()) return;
+    var ips = ($('dnsIps').value || '').trim();
+    if (!ips) { toast('请输入 IP'); return; }
+    var box = $('dnsResult');
+    setLoading(box);
+    try {
+      var data = await shodanFetch('/dns/reverse', { ips: ips });
+      box.innerHTML = renderDnsMap(data, 'Reverse 结果');
+      box.querySelectorAll('.copy-dns').forEach(function (b) {
+        b.addEventListener('click', function () { copyText(b.getAttribute('data-v')); });
+      });
+      var exp = box.querySelector('.toolbar .btn');
+      if (exp) exp.onclick = function () { downloadJson('shodan-dns-reverse.json', data); };
+    } catch (e) {
+      showError(box, e.message || String(e));
+    }
+  });
+
+  /* Honeyscore */
+  $('btnHoney').addEventListener('click', async function () {
+    if (!requireKey()) return;
+    var ip = ($('honeyIp').value || '').trim();
+    if (!ip) { toast('请输入 IP'); return; }
+    var box = $('honeyResult');
+    setLoading(box);
+    try {
+      var score = await shodanFetch('/labs/honeyscore/' + encodeURIComponent(ip));
+      var n = typeof score === 'number' ? score : parseFloat(score);
+      var label = n >= 0.8 ? '很可能是蜜罐' : (n >= 0.4 ? '可疑' : '较像真实主机');
+      var cls = n >= 0.8 ? 'vuln' : (n >= 0.4 ? 'warn' : 'ok');
+      box.innerHTML = '<div class="result-item"><div class="score-big">' + escapeHtml(String(score)) +
+        '</div><div style="text-align:center"><span class="badge ' + cls + '">' + label +
+        '</span></div><div class="meta" style="text-align:center;margin-top:8px">0 = 真实 · 1 = 蜜罐</div></div>';
+    } catch (e) {
+      showError(box, e.message || String(e));
+    }
+  });
+
+  /* Exploits */
+  $('btnExploits').addEventListener('click', async function () {
+    if (!requireKey()) return;
+    var q = ($('exploitQuery').value || '').trim();
+    if (!q) { toast('请输入查询'); return; }
+    var box = $('exploitResult');
+    setLoading(box);
+    try {
+      var data = await shodanFetch('/search', { query: q }, { base: EXPLOITS_API });
+      var matches = data.matches || [];
+      var html = '<div class="meta">共 ' + escapeHtml(String(data.total != null ? data.total : matches.length)) + ' 条</div>';
+      html += '<div class="toolbar" style="margin-top:8px"><button class="btn small secondary" type="button" id="btnExportExp">导出 JSON</button></div>';
+      html += '<div class="result-list" style="margin-top:8px">';
+      matches.slice(0, 30).forEach(function (m) {
+        html += '<div class="result-item"><div style="font-weight:650">' + escapeHtml(m.description || m.source || m.id || 'exploit') +
+          '</div><div class="meta">' + escapeHtml([m.source, m.author, (m.cve || []).join(', ')].filter(Boolean).join(' · ')) +
+          '</div></div>';
+      });
+      if (!matches.length) html += '<div class="empty">无结果或账户无 Exploits 权限</div>';
+      html += '</div>';
+      box.innerHTML = html;
+      var b = $('btnExportExp');
+      if (b) b.onclick = function () { downloadJson('shodan-exploits.json', data); };
+    } catch (e) {
+      showError(box, e.message || String(e));
+    }
+  });
+
+  /* Alerts */
+  $('btnAlerts').addEventListener('click', async function () {
+    if (!requireKey()) return;
+    var box = $('alertResult');
+    setLoading(box);
+    try {
+      var data = await shodanFetch('/shodan/alert/info');
+      var list = Array.isArray(data) ? data : (data ? [data] : []);
+      if (!list.length) {
+        box.innerHTML = '<div class="empty">当前没有网络警报</div>';
+        return;
+      }
+      var html = '<div class="toolbar"><button class="btn small secondary" type="button" id="btnExportAlerts">导出 JSON</button></div><div class="result-list">';
+      list.forEach(function (a) {
+        html += '<div class="result-item"><div style="font-weight:650">' + escapeHtml(a.name || a.id || 'alert') +
+          '</div><div class="meta mono">' + escapeHtml(a.id || '') + '</div>';
+        if (a.filters && a.filters.ip) {
+          html += '<div class="meta">IP/网段：' + escapeHtml((Array.isArray(a.filters.ip) ? a.filters.ip : [a.filters.ip]).join(', ')) + '</div>';
+        }
+        if (a.expires) html += '<div class="meta">过期：' + escapeHtml(String(a.expires)) + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+      box.innerHTML = html;
+      $('btnExportAlerts').onclick = function () { downloadJson('shodan-alerts.json', data); };
+    } catch (e) {
+      showError(box, e.message || String(e));
+    }
+  });
+
+  /* Boot */
+  updateKeyChip();
+  if (state.key) {
+    loadInfo();
+  }
+
+  // Expose for tests
+  window.__shodanApp = {
+    switchTab: switchTab,
+    getState: function () { return { hasKey: !!state.key, tab: document.querySelector('.tab-btn.active').getAttribute('data-tab') }; },
+    friendlyError: friendlyError,
+    version: '1.0.0'
+  };
+})();
+</script>
+</body>
+</html>
